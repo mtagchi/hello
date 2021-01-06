@@ -1,7 +1,17 @@
-FROM alpine
+FROM node
 
-# Dockerfileと同階層のhello.txtをコピーする。
-COPY hello.txt /tmp/hello.txt
+ENV NODE_ENV=production
 
-# 上記でコピーしたhello.txtをcatで確認
-CMD ["cat", "/tmp/hello.txt"]
+WORKDIR /scripts
+
+COPY . .
+
+RUN npm install \
+  && groupadd app \
+  && useradd -g app -m app \
+  && mv /root/.config /home/app/ \
+  && chown -R app:app /scripts /home/app/.config
+
+USER app
+
+CMD ["npm", "start"]
